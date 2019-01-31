@@ -107,6 +107,30 @@ func TestProducerPublish(t *testing.T) {
 	readMessages(topicName, t, msgCount)
 }
 
+func TestProducer_LeveledDeferPublish(t *testing.T) {
+	topicName := "publish" + strconv.Itoa(int(time.Now().Unix()))
+	msgCount := 10
+
+	config := NewConfig()
+	w, _ := NewProducer("127.0.0.1:4150", config)
+	w.SetLogger(nullLogger, LogLevelInfo)
+	defer w.Stop()
+
+	for i := 0; i < msgCount; i++ {
+		err := w.LeveledDeferPublish(topicName, 1, []byte("publish_test_case"))
+		if err != nil {
+			t.Fatalf("error %s", err)
+		}
+	}
+
+	err := w.LeveledDeferPublish(topicName, 1, []byte("bad_test_case"))
+	if err != nil {
+		t.Fatalf("error %s", err)
+	}
+
+	readMessages(topicName, t, msgCount)
+}
+
 func TestProducerMultiPublish(t *testing.T) {
 	topicName := "multi_publish" + strconv.Itoa(int(time.Now().Unix()))
 	msgCount := 10

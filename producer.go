@@ -202,6 +202,13 @@ func (w *Producer) DeferredPublish(topic string, delay time.Duration, body []byt
 	return w.sendCommand(DeferredPublish(topic, delay, body))
 }
 
+// LeveledDeferPublish synchronously publishes a message body to the specified topic
+// where the message will queue at the main topic until the corresponding timeout expires, returning
+// an error if publish failed
+func (w *Producer) LeveledDeferPublish(topic string, deferLevel int, body []byte) error {
+	return w.sendCommand(LeveledDeferPublish(topic, deferLevel, body))
+}
+
 // DeferredPublishAsync publishes a message body to the specified topic
 // where the message will queue at the channel level until the timeout expires
 // but does not wait for the response from `nsqd`.
